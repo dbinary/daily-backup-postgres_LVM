@@ -61,6 +61,7 @@ cd ${BACKUPDIR}
 if [ $? -eq 0 ]
 then
     backup
+    /usr/bin/logger -i -t $(basename $0) 'Proceso de backup Postgresql Finalizado con Exito'
 else
     /usr/bin/logger -i -t $(basename $0) "directory ${BACKUPDIR} doesn't exists"
     exit 1
