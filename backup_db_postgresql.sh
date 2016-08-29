@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/bin/bash -x
 
 STARTUPSCRIPT="/etc/init.d/postgresql"
-LVM="/dev/Data/pgsql"
-NEW_LVM="pgsql-snap"
-LVMS="/dev/Data/${NEW_LVM}"
+LVM="/dev/VolGroup01/postgresql"
+NEW_LVM="postgresql-snap"
+LVMS="/dev/VolGroup01/${NEW_LVM}"
 MNTP="/mnt/pgsql"
 BZ2FILE="pgsql-backup"
 BACKUPDIR="/ITM/backups"
@@ -46,12 +46,15 @@ function backup {
                 /usr/sbin/lvm lvremove -f ${LVMS}
             else
                 /usr/bin/logger -i -t $(basename $0) 'Error al crear archivo bz2'
+                return 1
             fi
         else
             /usr/bin/logger -i -t $(basename $0) 'Error al montar Snapshot'
+            return 1
         fi
     else
         /usr/bin/logger -i -t $(basename $0) 'Error al crear Snapshot LVM'
+        return 1
     fi
 }
 
@@ -61,7 +64,12 @@ cd ${BACKUPDIR}
 if [ $? -eq 0 ]
 then
     backup
-    /usr/bin/logger -i -t $(basename $0) 'Proceso de backup Postgresql Finalizado con Exito'
+    if [ $? -eq 0 ]
+    then
+        /usr/bin/logger -i -t $(basename $0) 'Proceso de backup Postgresql Finalizado con Exito'
+    else
+        /usr/bin/logger -i -t $(basename $0) 'Proceso de backup Postgresql Finalizado con Errores'
+    fi
 else
     /usr/bin/logger -i -t $(basename $0) "directory ${BACKUPDIR} doesn't exists"
     exit 1
