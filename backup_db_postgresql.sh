@@ -14,6 +14,10 @@ function rename_file {
     /bin/mv ${BACKUPDIR}/${BZ2FILE}.tar.bz2 ${BACKUPDIR}/${BZ2FILE}-${DATE}.tar.bz2
 }
 
+function retention_policy {
+    find ${BACKUPDIR} -name "pgsql-backup*" -mtime +7 -exec rm -rf {} \;
+}
+
 function backup {
     /usr/bin/logger -i -t $(basename $0) 'Deteniendo Postgresql'
     ${STARTUPSCRIPT} stop
@@ -33,8 +37,9 @@ function backup {
             rename_file
             ### CREATING BACKUP ###
             /usr/bin/logger -i -t $(basename $0) 'Creando Backup Postgresql'
+            /usr/bin/logger -i -t $(basename $0) 'Se excluye el directorio pg_log'
             cd /mnt/
-            /bin/tar -cjvf ${BACKUPDIR}/${BZ2FILE}.tar.bz2 pgsql
+            /bin/tar -cjvf ${BACKUPDIR}/${BZ2FILE}.tar.bz2 --exclude='pg_log' pgsql
             if [ $? -eq 0 ]
             then
                 ### UMOUNT SNAPSHOT ###
