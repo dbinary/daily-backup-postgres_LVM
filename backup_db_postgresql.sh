@@ -29,33 +29,38 @@ function backup {
         ### STARTING POSTGRESQL ###
         /usr/bin/logger -i -t $(basename $0) 'Iniciando Postgresql'
         ${STARTUPSCRIPT} start
-        ### MOUNT SNAPSHOT ###
-        /usr/bin/logger -i -t $(basename $0) 'Montando Snapshot'
-        /bin/mount ${LVMS} ${MNTP}
         if [ $? -eq 0 ]
         then
-            rename_file
-            ### CREATING BACKUP ###
-            /usr/bin/logger -i -t $(basename $0) 'Creando Backup Postgresql'
-            /usr/bin/logger -i -t $(basename $0) 'Se excluye el directorio pg_log'
-            cd /mnt/
-            /bin/tar -cjvf ${BACKUPDIR}/${BZ2FILE}.tar.bz2 --exclude='pg_log' pgsql
+            ### MOUNT SNAPSHOT ###
+            /usr/bin/logger -i -t $(basename $0) 'Montando Snapshot'
+            /bin/mount ${LVMS} ${MNTP}
             if [ $? -eq 0 ]
             then
-                ### UMOUNT SNAPSHOT ###
-                /usr/bin/logger -i -t $(basename $0) 'Desmontando Snapshot'
-                cd /tmp
-                /bin/umount ${MNTP}
-                ### REMOVE LVM SNAPSHOT ###
-                /usr/bin/logger -i -t $(basename $0) 'Eliminando SNAPSHOT LVM'
-                /usr/sbin/lvm lvremove -f ${LVMS}
+                rename_file
+                ### CREATING BACKUP ###
+                /usr/bin/logger -i -t $(basename $0) 'Creando Backup Postgresql'
+                /usr/bin/logger -i -t $(basename $0) 'Se excluye el directorio pg_log'
+                cd /mnt/
+                /bin/tar -cjvf ${BACKUPDIR}/${BZ2FILE}.tar.bz2 --exclude='pg_log' pgsql
+                if [ $? -eq 0 ]
+                then
+                    ### UMOUNT SNAPSHOT ###
+                    /usr/bin/logger -i -t $(basename $0) 'Desmontando Snapshot'
+                    cd /tmp
+                    /bin/umount ${MNTP}
+                    ### REMOVE LVM SNAPSHOT ###
+                    /usr/bin/logger -i -t $(basename $0) 'Eliminando SNAPSHOT LVM'
+                    /usr/sbin/lvm lvremove -f ${LVMS}
+                else
+                    /usr/bin/logger -i -t $(basename $0) 'Error al crear archivo bz2'
+                    return 1
+                fi
             else
-                /usr/bin/logger -i -t $(basename $0) 'Error al crear archivo bz2'
+                /usr/bin/logger -i -t $(basename $0) 'Error al montar Snapshot'
                 return 1
             fi
         else
-            /usr/bin/logger -i -t $(basename $0) 'Error al montar Snapshot'
-            return 1
+            /usr/bin/logger -i -t $(basename $0) 'Error al iniciar servicio Postgresql'
         fi
     else
         /usr/bin/logger -i -t $(basename $0) 'Error al crear Snapshot LVM'
