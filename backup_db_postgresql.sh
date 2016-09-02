@@ -1,12 +1,12 @@
 #!/bin/bash -x
 
-STARTUPSCRIPT="/etc/init.d/postgresql"
-LVM="/dev/VolGroup01/postgresql"
-NEW_LVM="postgresql-snap"
-LVMS="/dev/VolGroup01/${NEW_LVM}"
-MNTP="/mnt/pgsql"
-BZ2FILE="pgsql-backup"
-BACKUPDIR="/ITM/backups"
+STARTUPSCRIPT="/etc/init.d/postgresql" # startup script for init postgresql
+LVM="" # path of LV to backup i.e. /dev/VolGroup01/postgresql
+NEW_LVM="" # name for snapshot LV  i.e. postgresql-snap
+LVMS="" # path of new LV i.e. /dev/VolGroup01/${NEW_LVM}
+MNTP="/mnt/pgsql" # path for mount snapshot LVM (recommended this)
+BZ2FILE="pgsql-backup" # name for bz2 file backup
+BACKUPDIR="/ITM/backups" # remote dir  for store backup
 
 function rename_file {
     /usr/bin/logger -i -t $(basename $0) 'Renombrando Archivo de Backup Anterior'
