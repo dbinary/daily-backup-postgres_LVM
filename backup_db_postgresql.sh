@@ -6,7 +6,7 @@ NEW_LVM="" # name for snapshot LV  i.e. postgresql-snap
 LVMS="" # path of new LV i.e. /dev/VolGroup01/${NEW_LVM}
 MNTP="/mnt/pgsql" # path for mount snapshot LVM (recommended this)
 BZ2FILE="pgsql-backup" # name for bz2 file backup
-BACKUPDIR="/ITM/backups" # remote dir  for store backup
+BACKUPDIR="/PATH/backups" # remote dir  for store backup
 
 function rename_file {
     /usr/bin/logger -i -t $(basename $0) 'Renombrando Archivo de Backup Anterior'
