@@ -46,12 +46,11 @@ function wait_service {
         process_id=$(pgrep postmaster)
         if [ $? -eq 0 ]
         then
-            echo 1
             sleep 10
         else
-            echo 0
+            break
         fi
-    done                                                        done
+    done
 }
 
 function backup {
@@ -109,6 +108,7 @@ if [ $? -eq 0 ]
 then
     /usr/bin/logger -i -t $(basename $0) 'Deteniendo Postgresql'
     ${STARTUPSCRIPT} stop
+    /usr/bin/logger -i -t $(basename $0) "Ejecutando ${STARTUPSCRIPT} stop"
     wait_service
     backup
     if [ $? -eq 0 ]
