@@ -40,7 +40,7 @@ function retention_policy {
     find ${BACKUPDIR} -name "pgsql-backup*" -mtime +7 -exec rm -rf {} \;
 }
 
-funcion wait_service {
+function wait_service {
     while true; 
     do
         process_id=$(pgrep postmaster)
