@@ -40,9 +40,21 @@ function retention_policy {
     find ${BACKUPDIR} -name "pgsql-backup*" -mtime +7 -exec rm -rf {} \;
 }
 
+funcion wait_service {
+    while true; 
+    do
+        process_id=$(pgrep postmaster)
+        if [ $? -eq 0 ]
+        then
+            echo 1
+            sleep 10
+        else
+            echo 0
+        fi
+    done                                                        done
+}
+
 function backup {
-    /usr/bin/logger -i -t $(basename $0) 'Deteniendo Postgresql'
-    ${STARTUPSCRIPT} stop
     /usr/bin/logger -i -t $(basename $0) 'Creando SNAPSHOT LVM'
     ### CREATE LVM SNAPSHOT ###
     /usr/sbin/lvm lvcreate -s -n ${NEW_LVM} -l 100%FREE ${LVM}
@@ -95,6 +107,9 @@ function backup {
 cd ${BACKUPDIR}
 if [ $? -eq 0 ]
 then
+    /usr/bin/logger -i -t $(basename $0) 'Deteniendo Postgresql'
+    ${STARTUPSCRIPT} stop
+    wait_service
     backup
     if [ $? -eq 0 ]
     then
